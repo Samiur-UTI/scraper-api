@@ -2,7 +2,7 @@
 
 module.exports = function (sequelize, DataTypes) {
 
-    return sequelize.define('propertyType', {
+    return sequelize.define('county', {
             id: {
                 type: DataTypes.INTEGER,
                 primaryKey: true,
@@ -19,7 +19,7 @@ module.exports = function (sequelize, DataTypes) {
             }
         },
         {
-            tableName: 'property_type',
+            tableName: 'county',
 
             freezeTableName: true,
 
