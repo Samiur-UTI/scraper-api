@@ -2,24 +2,32 @@ const express = require('express')
 const app = express()
 const router = express.Router();
 const bodyParser = require('body-parser')
+const cors = require('cors')
 const port = process.env.PORT || 8000;
 const scrapeHome = require('./service/scrapeHome');
-
+const query = require('./service/query');
+app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 
 //Routes
 
 router.get('/', async (req, res) => {
+    console.log('Home page loader hitted!')
     const response = await scrapeHome();
     if(response.error) {
         return response.error;
     }
+    console.log("RESPONSE RETURNED")
     res.send(response);
 })
 
-router.get('/search', async function(req, res) {
-    // await scrape()
+router.post('/search', async function(req, res) {
+    const response = await query(req.body);
+    if(!response.success){
+        res.send(response);
+    }
+    console.log(req.body)
     res.send('Scrape complete')
 })
 router.get('/:id/details',function(req, res) {
