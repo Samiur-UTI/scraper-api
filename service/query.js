@@ -25,17 +25,15 @@ module.exports = async function query(req){
         attributes: ['name'],
         raw: true
     })
-    // console.log(propertyTypeDetails)
-    // console.log(countyDetails)
     const resultData = await db.property.findAll({
         where: {
             property_type: propertyTypeDetails.name,
-            county: countyDetails.name,
+            county: countyDetails ? countyDetails.name : null,
         },
         attributes: ['id','property_name','property_address','city','state','county','phone','property_type','zipcode','capacity','photo','property_id','county_id'],
     })
     if(!resultData.length){
-        console.log("SEND TO SEEACH")
+        console.log("SEND TO SEARCH")
         const result = await search((req))
         return {
             success: true,
