@@ -26,9 +26,11 @@ router.post('/search', async function(req, res) {
     const response = await query(req.body);
     if(!response.success){
         res.send(response);
+    }else{
+        res.send('Scrape complete')
     }
     console.log(response)
-    res.send('Scrape complete')
+    
 })
 router.get('/:id/details',function(req, res) {
     res.send('This is the details of id')

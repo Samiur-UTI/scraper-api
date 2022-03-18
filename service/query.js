@@ -20,7 +20,7 @@ module.exports = async function query(req){
     })
     const countyDetails =  await db.county.findOne({
         where: {
-            value: county
+            value: JSON.stringify(county)
         },
         attributes: ['name'],
         raw: true
@@ -35,9 +35,15 @@ module.exports = async function query(req){
     if(!resultData.length){
         console.log("SEND TO SEARCH")
         const result = await search((req))
-        return {
+        if(!result){
+            return {
+                success: false,
+                message: 'No results found'
+            }
+        }
+        return{
             success: true,
-            data: result
+            data: result.data
         }
     }
     //if query is in db, return the result
