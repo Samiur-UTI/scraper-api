@@ -1,4 +1,5 @@
 const db = require('../model/index');
+const search = require('./search');
 module.exports = async function query(req){
     //need to check if the searh query is valid
     if(!req.facility || !req.name){
@@ -34,7 +35,12 @@ module.exports = async function query(req){
         attributes: ['id','property_name','property_address','city','state','county','phone','property_type','zipcode','capacity','photo','property_id','county_id'],
     })
     if(!resultData.length){
-
+        console.log("SEND TO SEEACH")
+        const result = await search((req))
+        return {
+            success: true,
+            data: result
+        }
     }
     //if query is in db, return the result
     //if query is not in db, scrape the website and save the result to db and return the result

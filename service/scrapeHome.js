@@ -6,9 +6,9 @@ async function scrape() {
     try {
         await page.goto("https://www.floridahealthfinder.gov/facilitylocator/FacilitySearch.aspx")
         const optionsType = await page.$$eval("#ctl00_mainContentPlaceHolder_FacilityType option", options => options.map(option => option.text.trim()))
-        const valuesType = await page.$$eval("#ctl00_mainContentPlaceHolder_FacilityType option", options => options.map(option => option.value.trim()))
+        const valuesType = await page.$$eval("#ctl00_mainContentPlaceHolder_FacilityType option", options => options.map(option => option.value))
         const optionsCounty = await page.$$eval("#ctl00_mainContentPlaceHolder_County option", options => options.map(option => option.text.trim()))
-        const valuesCounty = await page.$$eval("#ctl00_mainContentPlaceHolder_County option", options => options.map(option => option.value.trim()))
+        const valuesCounty = await page.$$eval("#ctl00_mainContentPlaceHolder_County option", options => options.map(option => option.value))
         const propertyTypeTable = prepareTableResult(optionsType, valuesType)
         const countyTable = prepareTableResult(optionsCounty, valuesCounty)
         const propertyData = await db.propertyType.findAll({

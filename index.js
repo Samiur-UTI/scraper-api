@@ -27,7 +27,7 @@ router.post('/search', async function(req, res) {
     if(!response.success){
         res.send(response);
     }
-    console.log(req.body)
+    console.log(response)
     res.send('Scrape complete')
 })
 router.get('/:id/details',function(req, res) {
