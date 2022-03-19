@@ -22,10 +22,10 @@ module.exports = async function searchAndScrape(req) {
             await page.click('#SearchTable > tbody > tr:nth-child(9) > td:nth-child(2) > div.lookupFieldContainer > input')
             await page.click(`#ctl00_mainContentPlaceHolder_County > option:nth-child(${county})`)
         }
-        await page.screenshot({ path: 'screenshot1.png', fullPage: true });
+        // await page.screenshot({ path: 'screenshot1.png', fullPage: true });
         await page.click(`#ctl00_mainContentPlaceHolder_SearchButton`);
         await page.waitForNavigation();
-        await page.screenshot({ path: 'screenshot2.png', fullPage: true });
+        // await page.screenshot({ path: 'screenshot2.png', fullPage: true });
         let tableData = await page.$$eval('#ctl00_mainContentPlaceHolder_dgFacilities', row => {
             return Array.from(row, el => {
                 const columns = el.querySelectorAll('tr')

@@ -6,6 +6,7 @@ const cors = require('cors')
 const port = process.env.PORT || 8000;
 const scrapeHome = require('./service/scrapeHome');
 const query = require('./service/query');
+const searchDetails = require('./service/searchDetails')
 app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -34,9 +35,17 @@ router.post('/search', async function(req, res) {
     }
     console.log(response)
 })
-router.get('/details',function(req, res) {
-    console.log(req.query)
-    res.send('This is the details of id')
+router.get('/details',async function(req, res) {
+    if(req.query.hasOwnProperty('zip') && req.query.hasOwnProperty('property_address')) {
+        const response = await searchDetails(req.query);
+        if(response && response.success){
+            res.send(response)
+        }
+        return{
+            success: false,
+            message: "Could not find the search details"
+        }
+    }
 })
 
 

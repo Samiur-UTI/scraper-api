@@ -1,9 +1,9 @@
 "use strict";
 
-const Property = function (sequelize, DataTypes) {
+const PropertyDetails = function (sequelize, DataTypes) {
 
-    return sequelize.define('property', {
-        id: {
+    return sequelize.define('propertyDetails', {
+        property_detail_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
@@ -11,7 +11,7 @@ const Property = function (sequelize, DataTypes) {
                 notEmpty: true
             }
         },
-        property_name: {
+        name: {
             type: DataTypes.STRING
         },
         property_address: {
@@ -26,7 +26,16 @@ const Property = function (sequelize, DataTypes) {
         phone: {
             type: DataTypes.INTEGER
         },
+        photo: {
+            type: DataTypes.STRING
+        },
         property_type: {
+            type: DataTypes.STRING
+        },
+        property_address: {
+            type: DataTypes.STRING
+        },
+        county:{
             type: DataTypes.STRING
         },
         zip: {
@@ -35,16 +44,16 @@ const Property = function (sequelize, DataTypes) {
         capacity: {
             type: DataTypes.INTEGER
         },
-        property_type_id: {
+        property_id:{
             type: DataTypes.INTEGER,
             references: {
-                model: "propertyType",
+                model: "property",
                 key: "id"
             }
         }
     },
         {
-            tableName: 'property_search',
+            tableName: 'property_details',
 
             freezeTableName: true,
 
@@ -53,7 +62,7 @@ const Property = function (sequelize, DataTypes) {
             underscored: true
         });
 };
-Property.associate = function (models) {
-    Property.belongsTo(models.propertyType, { foreignKey: 'property_type_id' });
+PropertyDetails.associate = function (models) {
+    PropertyDetails.belongsTo(models.property, { foreignKey: 'property_id' });
 };
-module.exports = Property;
+module.exports = PropertyDetails;

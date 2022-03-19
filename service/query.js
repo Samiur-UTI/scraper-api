@@ -24,7 +24,6 @@ module.exports = async function query(req) {
                 'property_type',
                 'capacity',
                 'property_address',
-                'photo',
                 'property_type_id'
             ],
             raw: true,
