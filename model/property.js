@@ -23,16 +23,13 @@ const Property = function (sequelize, DataTypes) {
         state: {
             type: DataTypes.STRING
         },
-        county: {
-            type: DataTypes.STRING
-        },
         phone: {
             type: DataTypes.INTEGER
         },
         property_type: {
             type: DataTypes.STRING
         },
-        zipcode: {
+        zip: {
             type: DataTypes.INTEGER
         },
         capacity: {
@@ -41,23 +38,16 @@ const Property = function (sequelize, DataTypes) {
         photo: {
             type: DataTypes.STRING
         },
-        property_id: {
+        property_type_id: {
             type: DataTypes.INTEGER,
             references: {
                 model: "propertyType",
                 key: "id"
             }
-        },
-        county_id: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: "county",
-                key: "id"
-            }
         }
     },
         {
-            tableName: 'property',
+            tableName: 'property_search',
 
             freezeTableName: true,
 
@@ -67,7 +57,6 @@ const Property = function (sequelize, DataTypes) {
         });
 };
 Property.associate = function (models) {
-    Property.belongsTo(models.propertyType, { foreignKey: 'property_id' });
-    Property.belongsTo(models.county, { foreignKey: 'county_id' });
+    Property.belongsTo(models.propertyType, { foreignKey: 'property_type_id' });
 };
 module.exports = Property;

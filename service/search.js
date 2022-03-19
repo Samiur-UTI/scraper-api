@@ -33,11 +33,14 @@ module.exports = async function searchAndScrape(req) {
             })
         })
         tableData[0].splice(0,1)
-        const tableResult = prepareTableResult(tableData[0])
-        // console.log("TABLE RESULT ==========\n", tableResult)
-        
+        let propertySearch = await prepareTableResult(tableData[0])
         await browser.close();
-
+        // console.log("SEARCH RESULT ===========\n",propertySearch)
+        await db.property.bulkCreate(propertySearch.map(el => (el)))
+        return {
+            success: true,
+            data: propertySearch
+        }
     } catch (error) {
         return {
             success: false,
@@ -45,7 +48,7 @@ module.exports = async function searchAndScrape(req) {
         }
     }
 }
-function prepareTableResult(tableData) {
+async function prepareTableResult(tableData) {
     const resultArr = []
     tableData.forEach((el) => {
         const fieldObject = {
@@ -64,5 +67,35 @@ function prepareTableResult(tableData) {
         }
         resultArr.push(fieldObject)
     })
-    return resultArr
+    let propertySearch = await Promise.all(
+        resultArr.map(async (el) => {
+            const propertyTypeDetails = await db.propertyType.findOne({
+                where: {
+                    name: el.property_type
+                },
+                attributes: ['id'],
+                raw: true
+            })
+            return {
+                ...el,
+                ...Number(el.phone),
+                ...Number(el.zip),
+                ...Number(el.capacity),
+                property_type_id: propertyTypeDetails.id
+            }
+        })
+    )
+    propertySearch = propertySearch.map(property => {
+        return {
+            ...property,
+            property_name: property.property_name.replace(/\s\s+/g, ' '),
+            property_address: property.property_address.replace(/\s\s+/g, ' '),
+            city: property.city.replace(/\s\s+/g, ' '),
+            state: property.state.replace(/\s\s+/g, ' '),
+            zip: property.zip.replace(/\s\s+/g, ' '),
+            phone: property.phone.replace(/\s\s+/g, ' '),
+            capacity: Number(property.capacity)
+        }
+    })
+    return propertySearch
 }

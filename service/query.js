@@ -28,9 +28,8 @@ module.exports = async function query(req){
     const resultData = await db.property.findAll({
         where: {
             property_type: propertyTypeDetails.name,
-            county: countyDetails ? countyDetails.name : null,
         },
-        attributes: ['id','property_name','property_address','city','state','county','phone','property_type','zipcode','capacity','photo','property_id','county_id'],
+        attributes: ['id','property_name','property_address','city','state','phone','property_type','zip','capacity','photo','property_type_id'],
     })
     if(!resultData.length){
         console.log("SEND TO SEARCH")
