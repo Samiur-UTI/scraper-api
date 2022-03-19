@@ -24,13 +24,15 @@ router.get('/', async (req, res) => {
 
 router.post('/search', async function(req, res) {
     const response = await query(req.body);
-    if(!response.success){
-        res.send(response);
+    if(!response || !response.success) {
+        res.json({
+            success: false,
+            message: "Could not find the search result"
+        })
     }else{
-        res.send('Scrape complete')
+        res.send(response)
     }
     console.log(response)
-    
 })
 router.get('/:id/details',function(req, res) {
     res.send('This is the details of id')

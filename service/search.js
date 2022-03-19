@@ -39,7 +39,7 @@ module.exports = async function searchAndScrape(req) {
         await db.property.bulkCreate(propertySearch.map(el => (el)))
         return {
             success: true,
-            data: propertySearch
+            data: propertySearch ? propertySearch : []
         }
     } catch (error) {
         return {
