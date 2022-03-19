@@ -34,7 +34,8 @@ router.post('/search', async function(req, res) {
     }
     console.log(response)
 })
-router.get('/:id/details',function(req, res) {
+router.get('/details',function(req, res) {
+    console.log(req.query)
     res.send('This is the details of id')
 })
 

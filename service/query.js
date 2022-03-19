@@ -68,7 +68,7 @@ module.exports = async function query(req) {
     //if query is in db, return the result
     return {  
         success: true,
-        message: preparedResponse,
+        data: preparedResponse,
     } 
 }
 function sortAndFilterResult(dbResults,name,city){
