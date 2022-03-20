@@ -33,7 +33,6 @@ router.post('/search', async function(req, res) {
     }else{
         res.send(response)
     }
-    console.log(response)
 })
 router.get('/details',async function(req, res) {
     if(req.query.hasOwnProperty('zip') && req.query.hasOwnProperty('property_address')) {

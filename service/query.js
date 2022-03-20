@@ -47,7 +47,7 @@ module.exports = async function query(req) {
         // console.log("DB CHECK ==========\n", resultData)
     }
     const preparedResponse = sortAndFilterResult(resultData,name,city)
-    console.log("PREPARED RESPONSE ==========\n", preparedResponse)
+    // console.log("PREPARED RESPONSE ==========\n", preparedResponse)
     if(!preparedResponse.length){
         //if query is not in db, scrape the website and save the result to db and return the result
         console.log("SEND TO SEARCH")
