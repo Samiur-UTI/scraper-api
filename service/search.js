@@ -8,7 +8,7 @@ module.exports = async function searchAndScrape(req) {
         const browser = await scraper.launch();
         const page = await browser.newPage()
         await page.goto("https://www.floridahealthfinder.gov/facilitylocator/FacilitySearch.aspx")
-
+        await page.setDefaultNavigationTimeout(0)
         if (facility === 'ALL') {
             await page.select('select[name="ctl00$mainContentPlaceHolder$FacilityType"]', `${facility}`);
         } else {
