@@ -23,8 +23,10 @@ module.exports = async function searchAndScrape(req) {
             await page.click(`#ctl00_mainContentPlaceHolder_County > option:nth-child(${county})`)
         }
         // await page.screenshot({ path: 'screenshot1.png', fullPage: true });
-        await page.click(`#ctl00_mainContentPlaceHolder_SearchButton`);
-        await page.waitForNavigation();
+        await Promise.all([
+            page.click(`#ctl00_mainContentPlaceHolder_SearchButton`),
+            page.waitForNavigation()
+        ])
         // await page.screenshot({ path: 'screenshot2.png', fullPage: true });
         let tableData = await page.$$eval('#ctl00_mainContentPlaceHolder_dgFacilities', row => {
             return Array.from(row, el => {
@@ -32,8 +34,40 @@ module.exports = async function searchAndScrape(req) {
                 return columns.length ? Array.from(columns, col => col.innerText.trim()) : null
             })
         })
-        tableData[0].splice(0,1)
-        let propertySearch = await prepareTableResult(tableData[0])
+        const elementHandles = await page.$$('#ctl00_mainContentPlaceHolder_dgFacilities tr a');
+        const propertyJsHandles = await Promise.all(
+            elementHandles.map(async handle => {
+                return {
+                    href: await handle.getProperty('href'),
+                    id: await handle.getProperty('id')
+                }
+            })
+        );
+        const hrefs = await Promise.all(
+            propertyJsHandles.map(async handle => {
+                return {
+                    href: await handle.href.jsonValue(),
+                    id: await handle.id.jsonValue()
+                }
+            })
+        );
+        const filteredLinks = hrefs.filter(el => el.id.length > 0)
+        const propertyLinks = filteredLinks.reduce((acc, curr) => {
+            if (acc.length === 0) {
+                acc.push(curr.href)
+            }
+            else {
+                const last = acc[acc.length - 1]
+                if (last !== curr.href) {
+                    acc.push(curr.href)
+                }
+            }
+            return acc
+        }, [])
+        //Regex to filter out the map links
+        const mapLinks = propertyLinks.filter(el => el.match(/FacilityMap/g))
+        tableData[0].splice(0, 1)
+        let propertySearch = await prepareTableResult(tableData[0], mapLinks)
         await browser.close();
         // console.log("SEARCH RESULT ===========\n",propertySearch)
         await db.property.bulkCreate(propertySearch.map(el => (el)))
@@ -48,21 +82,24 @@ module.exports = async function searchAndScrape(req) {
         }
     }
 }
-async function prepareTableResult(tableData) {
+async function prepareTableResult(tableData, mapLinks) {
     const resultArr = []
-    tableData.forEach((el) => {
+    tableData.forEach((el, index) => {
+        // Add every map link into the end of each el with a \t before it
+        el = el.concat("\t" + mapLinks[index])
         const fieldObject = {
-            property_name:'',
-            property_type:'',
-            property_address:'',
-            city:'',
-            state:'',
-            zip:'',
-            phone:'',
-            capacity:''
+            property_name: '',
+            property_type: '',
+            property_address: '',
+            city: '',
+            state: '',
+            zip: '',
+            phone: '',
+            capacity: '',
+            map: ''
         }
         let tempArray = el.split('\t')
-        for(let i =0; i<tempArray.length; i++){
+        for (let i = 0; i < tempArray.length; i++) {
             fieldObject[Object.keys(fieldObject)[i]] = tempArray[i]
         }
         resultArr.push(fieldObject)
@@ -94,7 +131,8 @@ async function prepareTableResult(tableData) {
             state: property.state.replace(/\s\s+/g, ' '),
             zip: property.zip.replace(/\s\s+/g, ' '),
             phone: property.phone.replace(/\s\s+/g, ' '),
-            capacity: Number(property.capacity)
+            capacity: Number(property.capacity),
+            map: property.map
         }
     })
     return propertySearch

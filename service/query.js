@@ -29,6 +29,11 @@ module.exports = async function query(req) {
             raw: true,
         })
         // console.log("DB CHECK ==========\n", resultData)
+    }else if(facility == '-- Select --'){
+        return {
+            success: false,
+            message: 'Invalid search query'
+        }
     } else {
         const propertyTypeDetails = await db.propertyType.findOne({
             where: {
@@ -72,8 +77,10 @@ module.exports = async function query(req) {
 }
 function sortAndFilterResult(dbResults,name,city){
     let result = []
+    const regexName = new RegExp(name.toLowerCase(), 'i')
+    const regexCity = new RegExp(city.toLowerCase(), 'i')
     dbResults.forEach(el => {
-        if(el.property_name.toLowerCase().includes(name.toLowerCase()) && el.city.toLowerCase().includes(city.toLowerCase())){
+        if(regexName.test(el.property_name) && regexCity.test(el.city)){
             result.push(el)
         }
     })
@@ -83,5 +90,5 @@ function sortAndFilterResult(dbResults,name,city){
         if (x < y) {return -1;}
         if (x > y) {return 1;}
         return 0;
-      });
+    });
 }

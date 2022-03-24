@@ -35,6 +35,9 @@ const Property = function (sequelize, DataTypes) {
         capacity: {
             type: DataTypes.INTEGER
         },
+        map:{
+            type: DataTypes.STRING
+        },
         property_type_id: {
             type: DataTypes.INTEGER,
             references: {

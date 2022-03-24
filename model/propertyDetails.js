@@ -38,6 +38,9 @@ const PropertyDetails = function (sequelize, DataTypes) {
         county:{
             type: DataTypes.STRING
         },
+        map:{
+            type: DataTypes.STRING
+        },
         zip: {
             type: DataTypes.INTEGER
         },

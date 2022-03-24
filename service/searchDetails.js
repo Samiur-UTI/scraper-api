@@ -1,19 +1,25 @@
-const { raw } = require('body-parser');
 const scraper = require('puppeteer');
 const db = require('../model/index');
 module.exports = async function searchDetails(query) {
-    console.log("SEARCH DETAILS", query)
-    const prevDetails = await detailFinder(query.property_name);
+    // console.log("SEARCH DETAILS", query)
+    const prevDetails = await detailFinder(query.property_name,query.map);
     if (!prevDetails) {
         const browser = await scraper.launch();
         const page = await browser.newPage()
         await page.setDefaultNavigationTimeout(0)
         await page.goto("https://www.getzips.com/zip.htm")
         await page.type('#fldZIPCode', `${query.zip}`)
-        await page.click('body > table:nth-child(2) > tbody > tr:nth-child(2) > td > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(2) > form > div:nth-child(3) > p > input[type=SUBMIT]')
-        await page.waitForNavigation();
+        // await page.screenshot({ path: 'screenshot1.png', fullPage: true });
+        await Promise.all([
+            page.click('body > table:nth-child(2) > tbody > tr:nth-child(2) > td > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(2) > form > div:nth-child(3) > p > input[type=SUBMIT]'),
+            page.waitForNavigation()
+        ])
         let element = await page.$('body > p:nth-child(9) > table > tbody > tr:nth-child(2) > td:nth-child(3) > p')
         let value = await page.evaluate(el => el.textContent, element)
+        // MAP SCRAPING
+        let mapUrl = query.map ? query.map : 'https://www.floridahealthfinder.gov/facilitylocator/FacilityMap.aspx?pLicID=443001&pLinkID=2602207'
+        // await page.goto(mapUrl)
+        // await page.screenshot({ path: 'screenshot3.png', fullPage: true });
         if (value) {
             const propertyId = await db.property.findOne({
                 where: {
@@ -36,19 +42,22 @@ module.exports = async function searchDetails(query) {
                 county: value,
                 property_id: propertyId.id
             }
-            // console.log("property DETAILS", details)
             await db.propertyDetails.create(details)
-            const propertyDetails = await db.propertyDetails.findOne({
+            let propertyDetails = await db.propertyDetails.findOne({
                 where: {
                     name: details.name,
                     zip: details.zip
                 },
                 raw: true
             })
-            // console.log("property DETAILS", propertyDetails)
+            propertyDetails = {
+                ...propertyDetails,
+                map: mapUrl
+            }
+
             return {
                 success: true,
-                data: details
+                data: propertyDetails
             }
         }
         await browser.close();
@@ -61,20 +70,29 @@ module.exports = async function searchDetails(query) {
         data: prevDetails
     }
 }
-async function detailFinder(property_name) {
+async function detailFinder(property_name,map) {
     const response = await db.propertyDetails.findOne({
         where: {
             name: property_name,
         },
         raw: true
     })
-    return response;
+    if(response){
+        return {
+            ...response,
+            map
+        }
+    }
 }
 function photUrlMaker() {
-    let s3AccessUrl = 'https://boomershub.s3.ap-south-1.amazonaws.com/images/'
+    let s3AccessUrl = process.env.AWS_S3
     let array = []
     for (let i = 1; i <= 9; i++) {
-        let temp = s3AccessUrl + `${i}.jpg`
+        let ext = 'jpg';
+        if (i === 1 || i === 8) {
+            ext = 'png'
+        }
+        let temp = s3AccessUrl + `${i}.${ext}`
         array.push(temp)
     }
     // console.log(array)
