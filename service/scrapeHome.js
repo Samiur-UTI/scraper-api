@@ -1,7 +1,9 @@
 const scraper = require('puppeteer');
 const db = require('../model/index');
 async function scrape() {
-    const browser = await scraper.launch()
+    const browser = await scraper.launch({
+        executablePath: '/usr/bin/chromium-browser'
+    })
     const page = await browser.newPage()
     try {
         await page.goto("https://www.floridahealthfinder.gov/facilitylocator/FacilitySearch.aspx")

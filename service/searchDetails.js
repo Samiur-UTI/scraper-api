@@ -4,7 +4,9 @@ module.exports = async function searchDetails(query) {
     // console.log("SEARCH DETAILS", query)
     const prevDetails = await detailFinder(query.property_name,query.map);
     if (!prevDetails) {
-        const browser = await scraper.launch();
+        const browser = await scraper.launch({
+            executablePath: '/usr/bin/chromium-browser'
+        });
         const page = await browser.newPage()
         await page.setDefaultNavigationTimeout(0)
         await page.goto("https://www.getzips.com/zip.htm")

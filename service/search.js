@@ -5,7 +5,9 @@ module.exports = async function searchAndScrape(req) {
     county = Array.isArray(county) ? '' : Number(county) + 1
     try {
         // console.log(facility, name, city, county, address, zip)
-        const browser = await scraper.launch();
+        const browser = await scraper.launch({
+            executablePath: '/usr/bin/chromium-browser'
+        });
         const page = await browser.newPage()
         await page.goto("https://www.floridahealthfinder.gov/facilitylocator/FacilitySearch.aspx")
         await page.setDefaultNavigationTimeout(0)
